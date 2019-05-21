@@ -3,9 +3,6 @@ plugins {
     kotlin("kapt")
 }
 
-group = "com.vinted.automerger"
-version = "0.1"
-
 tasks {
     "test"(Test::class) {
         useJUnitPlatform()
@@ -29,4 +26,8 @@ dependencies {
     testImplementation("lt.neworld:kupiter:${Versions.kupiter}")
     testImplementation("com.google.auto.service:auto-service:1.0-rc5")
     kaptTest("com.google.auto.service:auto-service:1.0-rc5")
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
 }

@@ -13,7 +13,7 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
     private val releaseBranchPattern = autoMergerBuilder.releaseBranchPattern
         .checkNotEmpty("Pattern must be set. For example 'release/%'")
 
-    private val mergeConfig = autoMergerBuilder.mergeCongif.toList()
+    private val mergeConfig = autoMergerBuilder.mergeConfigs.toList()
 
     private val pathToRepo = autoMergerBuilder.pathToRepo
         .checkNotNull("Path must be set")

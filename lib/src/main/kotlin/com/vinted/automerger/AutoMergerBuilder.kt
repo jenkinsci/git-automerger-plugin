@@ -10,7 +10,7 @@ class AutoMergerBuilder {
     var releaseBranchPattern = "release/%"
         private set
 
-    val mergeCongif = mutableListOf<MergeConfig>()
+    val mergeConfigs = mutableListOf<MergeConfig>()
 
     var pathToRepo: File? = null
         private set
@@ -27,7 +27,7 @@ class AutoMergerBuilder {
     /**
      * Only configured conflicts are solved.
      */
-    fun addMergeConfig(mergeConfig: MergeConfig) = apply { this.mergeCongif += mergeConfig }
+    fun addMergeConfig(mergeConfig: MergeConfig) = apply { this.mergeConfigs += mergeConfig }
 
     /**
      * Path to repo where `.git` folder exist
