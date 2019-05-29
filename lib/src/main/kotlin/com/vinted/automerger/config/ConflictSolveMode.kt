@@ -8,7 +8,7 @@ package com.vinted.automerger.config
  * | Foo         | Bar         |
  * |-------------|-------------|
  * ```
- * According mode, one of four outcome available:
+ * According to selected resolution, one of outcome could be:
  *
  * ```
  * | [KEEP_OLDER] | [KEEP_NEWER] | [MERGE_NEWER_TOP] | [MERGE_OLDER_TOP] |
@@ -18,7 +18,7 @@ package com.vinted.automerger.config
  *                               |-------------------|-------------------|
  * ```
  */
-enum class ConflictSolverMode(internal val impl: (new: String, old: String) -> String) {
+enum class Resolution(internal val impl: (new: String, old: String) -> String) {
     KEEP_OLDER({ _, old -> old }),
     KEEP_NEWER({ new, _ -> new }),
     MERGE_OLDER_TOP({ new, old -> old + "\n" + new }),

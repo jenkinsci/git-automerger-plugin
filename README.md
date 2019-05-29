@@ -64,9 +64,9 @@ For example, for `CHANGELOG.md` you would probably prefer to use `MERGE_NEWER_TO
 ### Example:
 ```groovy
 gitAutomerger logLevel: 'INFO',
-              mergeConfigs: [
-                  [mode: 'KEEP_NEWER', path: 'VERSION'],
-                  [mode: 'MERGE_NEWER_TOP', path: 'CHANGELOG.md']
+              mergeRules: [
+                  [path: 'CHANGELOG.md', resolution: 'MERGE_NEWER_TOP'],
+                  [path: 'version', resolution: 'KEEP_NEWER'],
               ],
               releaseBranchPattern: 'release/%'
 ```

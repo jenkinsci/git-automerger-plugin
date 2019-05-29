@@ -2,5 +2,6 @@ package com.vinted.automerger.config
 
 /**
  * @param path must be relative path to file. Patterns is not supported
+ * @param resolution see [Resolution]
  */
-data class MergeConfig(val path: String, val mode: ConflictSolverMode)
+data class MergeRule(val path: String, val resolution: Resolution)

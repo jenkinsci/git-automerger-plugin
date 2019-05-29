@@ -1,13 +1,13 @@
 package com.vinted.automerger.resolver
 
-import com.vinted.automerger.config.ConflictSolverMode
+import com.vinted.automerger.config.Resolution
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
 internal class Resolver(
     private val input: FileInputStream,
     private val output: FileOutputStream,
-    private val mode: ConflictSolverMode
+    private val mode: Resolution
 ) {
     fun resolve() {
         input.bufferedReader().use { input ->

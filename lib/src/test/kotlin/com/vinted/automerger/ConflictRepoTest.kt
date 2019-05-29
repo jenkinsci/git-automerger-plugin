@@ -1,7 +1,7 @@
 package com.vinted.automerger
 
-import com.vinted.automerger.config.ConflictSolverMode
-import com.vinted.automerger.config.MergeConfig
+import com.vinted.automerger.config.Resolution
+import com.vinted.automerger.config.MergeRule
 import com.vinted.automerger.testutils.RepoExtension
 import com.vinted.automerger.testutils.checkoutBranch
 import com.vinted.automerger.testutils.checkoutMaster
@@ -33,13 +33,13 @@ class ConflictRepoTest {
 
         defaultBuilder = AutoMergerBuilder()
             .pathToRepo(repo.path)
-            .addMergeConfig(MergeConfig(versionFile.name, ConflictSolverMode.KEEP_NEWER))
-            .addMergeConfig(MergeConfig(changelogFile.name, ConflictSolverMode.MERGE_NEWER_TOP))
+            .addMergeConfig(MergeRule(versionFile.name, Resolution.KEEP_NEWER))
+            .addMergeConfig(MergeRule(changelogFile.name, Resolution.MERGE_NEWER_TOP))
 
         reverseBuilder = AutoMergerBuilder()
             .pathToRepo(repo.path)
-            .addMergeConfig(MergeConfig(versionFile.name, ConflictSolverMode.KEEP_OLDER))
-            .addMergeConfig(MergeConfig(changelogFile.name, ConflictSolverMode.MERGE_OLDER_TOP))
+            .addMergeConfig(MergeRule(versionFile.name, Resolution.KEEP_OLDER))
+            .addMergeConfig(MergeRule(changelogFile.name, Resolution.MERGE_OLDER_TOP))
     }
 
     @Nested

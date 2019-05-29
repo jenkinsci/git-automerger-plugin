@@ -93,7 +93,7 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
             }
 
             logger.debug("Solving $fileName")
-            Resolver(currentFile.inputStream(), tmpFile.outputStream(), mode.mode).resolve()
+            Resolver(currentFile.inputStream(), tmpFile.outputStream(), mode.resolution).resolve()
 
             logger.debug("Conflict solved")
             tmpFile.copyTo(currentFile, overwrite = true)

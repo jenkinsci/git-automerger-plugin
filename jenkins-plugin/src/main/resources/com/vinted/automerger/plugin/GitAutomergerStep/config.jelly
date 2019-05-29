@@ -7,7 +7,7 @@
     </f:entry>
 
     <f:entry title="Conflict resolution config" help="/plugin/git-automerger/conflict-solve.html">
-        <f:repeatableProperty field="mergeConfigs">
+        <f:repeatableProperty field="mergeRules">
             <f:entry title="">
                 <div align="right">
                     <f:repeatableDeleteButton/>

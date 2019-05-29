@@ -1,6 +1,6 @@
 package com.vinted.automerger
 
-import com.vinted.automerger.config.MergeConfig
+import com.vinted.automerger.config.MergeRule
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -10,7 +10,7 @@ class AutoMergerBuilder {
     var releaseBranchPattern = "release/%"
         private set
 
-    val mergeConfigs = mutableListOf<MergeConfig>()
+    val mergeConfigs = mutableListOf<MergeRule>()
 
     var pathToRepo: File? = null
         private set
@@ -27,7 +27,7 @@ class AutoMergerBuilder {
     /**
      * Only configured conflicts are solved.
      */
-    fun addMergeConfig(mergeConfig: MergeConfig) = apply { this.mergeConfigs += mergeConfig }
+    fun addMergeConfig(mergeRule: MergeRule) = apply { this.mergeConfigs += mergeRule }
 
     /**
      * Path to repo where `.git` folder exist

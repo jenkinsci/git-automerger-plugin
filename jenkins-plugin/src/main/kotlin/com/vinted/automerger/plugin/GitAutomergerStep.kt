@@ -21,7 +21,7 @@ import java.io.File
 
 class GitAutomergerStep @DataBoundConstructor constructor(
     val releaseBranchPattern: String,
-    val mergeConfigs: List<JenkinsMergeConfig>?,
+    val mergeRules: List<JenkinsMergeRule>?,
     val logLevel: LogLevel
 ) : Builder(), SimpleBuildStep {
 
@@ -52,7 +52,7 @@ class GitAutomergerStep @DataBoundConstructor constructor(
                     .releaseBranchPattern(releaseBranchPattern)
                     .logger(logger)
 
-                mergeConfigs.orEmpty().map(JenkinsMergeConfig::toMergeConfig).forEach {
+                mergeRules.orEmpty().map(JenkinsMergeRule::toMergeConfig).forEach {
                     builder.addMergeConfig(it)
                 }
 
