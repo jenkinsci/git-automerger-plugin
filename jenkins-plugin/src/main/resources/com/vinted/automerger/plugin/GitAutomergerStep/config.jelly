@@ -15,4 +15,8 @@
             </f:entry>
         </f:repeatableProperty>
     </f:entry>
+
+    <f:entry title="Log level" field="logLevel">
+        <f:enum default="WARN">${it.name()}</f:enum>
+    </f:entry>
 </j:jelly>

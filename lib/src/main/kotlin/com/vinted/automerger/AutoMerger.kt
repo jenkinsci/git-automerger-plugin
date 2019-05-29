@@ -44,6 +44,16 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
     fun automerge() {
         val allReleaseBranches = allReleaseBranches()
 
+        if (allReleaseBranches.size == 1) {
+            logger.warn("Only applicable ${allReleaseBranches.first().name} branch was found. Nothing to merge")
+            return
+        }
+
+        if (allReleaseBranches.isEmpty()) {
+            logger.warn("Repository is missing 'master' and other applicable branches.")
+            return
+        }
+
         for ((from, to) in allReleaseBranches.windowed(2)) {
             logger.debug("Merge {} -> {}", from.name, to.name)
             with(git) {

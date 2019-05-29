@@ -31,14 +31,13 @@ jenkinsPlugin {
 dependencies {
     implementation(project(":lib"))
     implementation(kotlin("stdlib-jdk8"))
-    implementation("org.slf4j:slf4j-simple:${Versions.slf4j}")
+    implementation("com.vinted:slf4j-streamadapter:1.0.0")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${Versions.junit5Version}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${Versions.junit5Version}")
     testImplementation("org.junit.jupiter:junit-jupiter-params:${Versions.junit5Version}")
     testImplementation("lt.neworld:kupiter:${Versions.kupiter}")
 
-//    optionalJenkinsPlugins("org.jenkins-ci.plugins:pipelines:2.6")
     // sezpoz is used to process extension annotations
     kapt("net.java.sezpoz:sezpoz:1.13")
 }

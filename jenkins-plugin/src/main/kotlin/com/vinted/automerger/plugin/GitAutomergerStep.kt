@@ -1,6 +1,7 @@
 package com.vinted.automerger.plugin
 
 import com.vinted.automerger.AutoMergerBuilder
+import com.vinted.slf4j.adapter.SLF4JOutputStreamAdapter
 import hudson.FilePath
 import hudson.Launcher
 import hudson.model.Descriptor
@@ -20,7 +21,8 @@ import java.io.File
 
 class GitAutomergerStep @DataBoundConstructor constructor(
     val releaseBranchPattern: String,
-    val mergeConfigs: List<JenkinsMergeConfig>
+    val mergeConfigs: List<JenkinsMergeConfig>?,
+    val logLevel: LogLevel
 ) : Builder(), SimpleBuildStep {
 
     override fun getDescriptor(): Descriptor<Builder> = DESCRIPTOR
@@ -37,7 +39,8 @@ class GitAutomergerStep @DataBoundConstructor constructor(
     }
 
     override fun perform(run: Run<*, *>, workspace: FilePath, launcher: Launcher, listener: TaskListener) {
-        listener.logger.println("Hello world!")
+        val logger = SLF4JOutputStreamAdapter(listener.logger, logLevel.levelInt)
+
         workspace.act(object : FilePath.FileCallable<Any> {
             override fun checkRoles(checker: RoleChecker) {
                 throw SecurityException()
@@ -47,8 +50,9 @@ class GitAutomergerStep @DataBoundConstructor constructor(
                 val builder = AutoMergerBuilder()
                     .pathToRepo(file)
                     .releaseBranchPattern(releaseBranchPattern)
+                    .logger(logger)
 
-                mergeConfigs.map(JenkinsMergeConfig::toMergeConfig).forEach {
+                mergeConfigs.orEmpty().map(JenkinsMergeConfig::toMergeConfig).forEach {
                     builder.addMergeConfig(it)
                 }
 
