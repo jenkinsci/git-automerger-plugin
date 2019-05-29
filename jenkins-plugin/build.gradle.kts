@@ -1,3 +1,6 @@
+import org.jenkinsci.gradle.plugins.jpi.JpiDeveloper
+import org.jenkinsci.gradle.plugins.jpi.JpiExtension
+import org.jenkinsci.gradle.plugins.jpi.JpiLicense
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.internal.KaptTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -22,10 +25,31 @@ tasks {
 
 jenkinsPlugin {
     coreVersion = "2.164.3"
-    displayName = "Git branches automerger plugin"
+    displayName = "Git Automerger Plugin"
     url = "https://github.com/vinted/git-automerger"
     gitHubUrl = "https://github.com/vinted/git-automerger"
     shortName = "git-automerger"
+    description = "Tool for merging release branches into master."
+
+    developers(closureOf<JpiExtension.Developers> {
+        developer(closureOf<JpiDeveloper> {
+            setProperty("id", "neworldlt")
+            setProperty("name", "Andrius Semionovas")
+            setProperty("email", "aneworld@gmail.com")
+            setProperty("url", "https://github.com/neworld/")
+            setProperty("organization", "Vinted UAB")
+            setProperty("organizationUrl", "https://engineering.vinted.com/")
+            setProperty("timezone", "Vilnius GMT+2")
+        })
+    })
+
+    licenses(closureOf<JpiExtension.Licenses> {
+        license(closureOf<JpiLicense> {
+            setProperty("name", "MIT")
+            setProperty("url", "https://raw.githubusercontent.com/vinted/git-automerger/master/LICENSE")
+            setProperty("distribution", "repo")
+        })
+    })
 }
 
 dependencies {
