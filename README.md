@@ -1,3 +1,5 @@
+[![Build Status](https://ci.jenkins.io/buildStatus/icon?job=Plugins%2Fgit-automerger-plugin%2Fmaster)](https://ci.jenkins.io/job/Plugins/job/git-automerger-plugin/job/master/)
+
 The main purpose of this plugin is to ensure that all newer versions include all the changes from older versions.
 
 ### Requirements
