@@ -26,8 +26,8 @@ tasks {
 jenkinsPlugin {
     coreVersion = "2.164.3"
     displayName = "Git Automerger Plugin"
-    url = "https://github.com/vinted/git-automerger"
-    gitHubUrl = "https://github.com/vinted/git-automerger"
+    url = "https://github.com/jenkinsci/git-automerger-plugin"
+    gitHubUrl = "https://github.com/jenkinsci/git-automerger-plugin"
     shortName = "git-automerger"
     description = "Tool for merging release branches into master."
 
