@@ -24,7 +24,7 @@ tasks {
 }
 
 jenkinsPlugin {
-    coreVersion = "2.164.3"
+    coreVersion = "2.150.3"
     displayName = "Git Automerger Plugin"
     url = "https://github.com/jenkinsci/git-automerger-plugin"
     gitHubUrl = "https://github.com/jenkinsci/git-automerger-plugin"
@@ -46,7 +46,7 @@ jenkinsPlugin {
     licenses(closureOf<JpiExtension.Licenses> {
         license(closureOf<JpiLicense> {
             setProperty("name", "MIT")
-            setProperty("url", "https://raw.githubusercontent.com/vinted/git-automerger/master/LICENSE")
+            setProperty("url", "https://raw.githubusercontent.com/jenkinsci/git-automerger/master/LICENSE")
             setProperty("distribution", "repo")
         })
     })
