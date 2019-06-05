@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.vinted.automerger"
-version = "0.1"
+version = "0.2"
 
 allprojects {
     repositories {
