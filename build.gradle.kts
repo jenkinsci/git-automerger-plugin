@@ -4,9 +4,6 @@ plugins {
     kotlin("jvm") version "1.3.30" apply false
 }
 
-group = "com.vinted.automerger"
-version = "0.2"
-
 allprojects {
     repositories {
         mavenCentral()

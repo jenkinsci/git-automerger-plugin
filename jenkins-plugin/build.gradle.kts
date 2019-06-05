@@ -11,6 +11,9 @@ plugins {
     id("org.jenkins-ci.jpi") version "0.32.0"
 }
 
+group = "com.vinted.automerger"
+version = "0.2"
+
 tasks {
     "test"(Test::class) {
         useJUnitPlatform()
