@@ -2,10 +2,7 @@ package com.vinted.automerger
 
 import com.vinted.automerger.config.Resolution
 import com.vinted.automerger.config.MergeRule
-import com.vinted.automerger.testutils.RepoExtension
-import com.vinted.automerger.testutils.checkoutBranch
-import com.vinted.automerger.testutils.checkoutMaster
-import com.vinted.automerger.testutils.commitAll
+import com.vinted.automerger.testutils.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.BeforeEach
@@ -18,7 +15,7 @@ import java.io.File
 class ConflictRepoTest {
     @RegisterExtension
     @JvmField
-    val repo: RepoExtension = RepoExtension()
+    val repo: RepoExtension = DefaultRepoExtension()
 
     private lateinit var defaultBuilder: AutoMergerBuilder
     private lateinit var reverseBuilder: AutoMergerBuilder

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.BeforeEachCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 import java.io.File
 
-class RepoExtension : BeforeEachCallback, AfterEachCallback {
+open class RepoExtension : BeforeEachCallback, AfterEachCallback {
     lateinit var path: File
         private set
 
@@ -24,9 +24,6 @@ class RepoExtension : BeforeEachCallback, AfterEachCallback {
 
         with(git) {
             commit().setAllowEmpty(true).setMessage("init commit").call()
-            createRelease("8.9")
-            createRelease("8.10")
-            checkoutMaster()
         }
     }
 

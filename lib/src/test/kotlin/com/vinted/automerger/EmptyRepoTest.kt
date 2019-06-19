@@ -8,7 +8,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 class EmptyRepoTest {
     @RegisterExtension
     @JvmField
-    val repo: RepoExtension = RepoExtension()
+    val repo: RepoExtension = DefaultRepoExtension()
 
     private lateinit var defaultBuilder: AutoMergerBuilder
 

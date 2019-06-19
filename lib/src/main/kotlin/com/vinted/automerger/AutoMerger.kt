@@ -4,7 +4,9 @@ import com.vinted.automerger.resolver.Resolver
 import com.vinted.automerger.utils.checkNotEmpty
 import com.vinted.automerger.utils.checkNotNull
 import org.apache.maven.artifact.versioning.ComparableVersion
+import org.eclipse.jgit.api.CreateBranchCommand
 import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.api.ListBranchCommand
 import org.eclipse.jgit.api.ResetCommand
 import org.eclipse.jgit.lib.Ref
 import org.eclipse.jgit.merge.MergeStrategy
@@ -20,9 +22,11 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
 
     private val logger = autoMergerBuilder.logger
 
+    private val remote = autoMergerBuilder.remote
+
     private val git: Git
 
-    val branchPatternRegex = releaseBranchPattern.replace("%", "([0-9.]+)").plus("$").toRegex()
+    private val branchPatternRegex = releaseBranchPattern.replace("%", "([0-9.]+)").plus("$").toRegex()
 
     init {
         if (!pathToRepo.exists()) {
@@ -85,7 +89,7 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
         if (mode == null) {
             throw RuntimeException("There is no defined conflict solver for $fileName")
         } else {
-            val currentFile = pathToRepo.resolve("$fileName")
+            val currentFile = pathToRepo.resolve(fileName)
             val tmpFile = pathToRepo.resolve("$fileName.tmp")
 
             if (tmpFile.exists()) {
@@ -102,6 +106,33 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
     }
 
     private fun allReleaseBranches(): List<Ref> {
+        if (remote != null) {
+            logger.debug("Remote $remote is set. Checkout all branches")
+            val gitRefPath = "refs/remotes/$remote/"
+            val localBranches = git.branchList().call().map { it.name.removePrefix("refs/heads") }
+            git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call()
+                .filter { it.name.startsWith(gitRefPath) }
+                .forEach { ref ->
+                    val name = ref.name.removePrefix(gitRefPath)
+
+                    if (!name.matches(branchPatternRegex)) {
+                        return@forEach
+                    }
+
+                    logger.debug("Checkout ${ref.name} -> $name")
+
+                    if (localBranches.contains(name)) {
+                        throw IllegalStateException("Local branch already exists for ${ref.name}")
+                    }
+
+                    git.checkout()
+                        .setName(name)
+                        .setCreateBranch(true)
+                        .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
+                        .setStartPoint(ref.name)
+                        .call()
+                }
+        }
         return git.branchList().call()
             .flatMap { ref ->
                 val name = ref.name.removePrefix("refs/heads/")
