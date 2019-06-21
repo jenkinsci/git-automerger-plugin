@@ -4,10 +4,7 @@ import com.vinted.automerger.resolver.Resolver
 import com.vinted.automerger.utils.checkNotEmpty
 import com.vinted.automerger.utils.checkNotNull
 import org.apache.maven.artifact.versioning.ComparableVersion
-import org.eclipse.jgit.api.CreateBranchCommand
-import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.api.ListBranchCommand
-import org.eclipse.jgit.api.ResetCommand
+import org.eclipse.jgit.api.*
 import org.eclipse.jgit.lib.Ref
 import org.eclipse.jgit.merge.MergeStrategy
 
@@ -22,7 +19,8 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
 
     private val logger = autoMergerBuilder.logger
 
-    private val remote = autoMergerBuilder.remote
+    private val remoteName = autoMergerBuilder.remoteName
+    private val checkoutFromRemote = autoMergerBuilder.checkoutFromRemote
 
     private val git: Git
 
@@ -46,6 +44,8 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
     }
 
     fun automerge() {
+        checkWorkingDir()
+
         val allReleaseBranches = allReleaseBranches()
 
         if (allReleaseBranches.size == 1) {
@@ -84,6 +84,18 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
         }
     }
 
+    private fun checkWorkingDir() {
+        val status = git.status().call()
+        if (!status.isClean) {
+            logger.error("Working space is not clean")
+
+            val dirtyFiles = status.added + status.removed + status.changed + status.untracked
+            logger.debug("Dirty files: ${dirtyFiles.joinToString(", ")}")
+
+            throw IllegalStateException("Working space is not clean")
+        }
+    }
+
     private fun tryResolveConflict(fileName: String) {
         val mode = mergeConfig.find { it.path == fileName }
         if (mode == null) {
@@ -106,31 +118,41 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
     }
 
     private fun allReleaseBranches(): List<Ref> {
-        if (remote != null) {
-            logger.debug("Remote $remote is set. Checkout all branches")
-            val gitRefPath = "refs/remotes/$remote/"
-            val localBranches = git.branchList().call().map { it.name.removePrefix("refs/heads") }
+        if (checkoutFromRemote) {
+            logger.info("Checkout from remote $remoteName")
+            val gitRefPath = "refs/remotes/$remoteName/"
+            val localBranches = git.branchList().call().map { it.name.removePrefix("refs/heads/") }
             git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call()
                 .filter { it.name.startsWith(gitRefPath) }
                 .forEach { ref ->
                     val name = ref.name.removePrefix(gitRefPath)
 
-                    if (!name.matches(branchPatternRegex)) {
+                    if (!name.matches(branchPatternRegex) && name != MASTER) {
                         return@forEach
                     }
 
-                    logger.debug("Checkout ${ref.name} -> $name")
+                    logger.info("Checkout ${ref.name} -> $name")
 
                     if (localBranches.contains(name)) {
-                        throw IllegalStateException("Local branch already exists for ${ref.name}")
-                    }
+                        logger.debug("Local branch '$name' was found and it is used, try to pull")
+                        val result = git.pull()
+                            .setRemote(remoteName)
+                            .setRemoteBranchName(name)
+                            .setFastForward(MergeCommand.FastForwardMode.FF_ONLY)
+                            .call()
 
-                    git.checkout()
-                        .setName(name)
-                        .setCreateBranch(true)
-                        .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
-                        .setStartPoint(ref.name)
-                        .call()
+                        if (!result.isSuccessful) {
+                            throw java.lang.IllegalStateException("Local branch '$name' diverged from remote")
+                        }
+                    } else {
+                        logger.debug("Local branch '$name' was not found. Do checkout for it")
+                        git.checkout()
+                            .setName(name)
+                            .setCreateBranch(true)
+                            .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
+                            .setStartPoint(ref.name)
+                            .call()
+                    }
                 }
         }
         return git.branchList().call()
@@ -146,6 +168,10 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
             }
             .sortedBy { it.second }
             .map { it.first }
-            .plus(git.branchList().call().filter { it.name.endsWith("master") }.take(1))
+            .plus(git.branchList().call().filter { it.name.endsWith(MASTER) }.take(1))
+    }
+
+    companion object {
+        private const val MASTER = "master"
     }
 }

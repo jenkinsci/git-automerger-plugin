@@ -18,10 +18,10 @@ class AutoMergerBuilder {
     var logger: Logger = LoggerFactory.getLogger(AutoMerger::class.java)
         private set
 
-    /**
-     * null means do not use remote branches
-     */
-    var remote: String? = null
+    var remoteName: String = "origin"
+        private set
+
+    var checkoutFromRemote: Boolean = false
         private set
 
     /**
@@ -43,12 +43,16 @@ class AutoMergerBuilder {
     fun logger(logger: Logger) = apply { this.logger = logger }
 
     /**
-     * @param remote makes tool to scan remote branches `refs/remotes/<remote>/%`.
-     * Otherwise `refs/heads/%` are scanned.
-     * In most cases you would like to use`origin`.
-     * This property does not allow plugin to fetch remote repositories.
+     * If enabled, the library will checkout remote branches before merging
      */
-    fun remote(remote: String) = apply { this.remote = remote }
+    fun checkoutFromRemote(enabled: Boolean) = apply { this.checkoutFromRemote = enabled }
+
+    /**
+     * @param remote name of remote branch.
+     * Do not work if [checkoutFromRemote] is disabled.
+     * Default `origin`
+     */
+    fun remoteName(remote: String) = apply { this.remoteName = remote }
 
     fun build() = AutoMerger(this)
 }

@@ -70,7 +70,9 @@ gitAutomerger logLevel: 'INFO',
                   [path: 'CHANGELOG.md', resolution: 'MERGE_NEWER_TOP'],
                   [path: 'version', resolution: 'KEEP_NEWER'],
               ],
-              releaseBranchPattern: 'release/%'
+              releaseBranchPattern: 'release/%',
+              checkoutFromRemote: true,
+              remoteName: 'origin'
 ```
 
 ### Testing

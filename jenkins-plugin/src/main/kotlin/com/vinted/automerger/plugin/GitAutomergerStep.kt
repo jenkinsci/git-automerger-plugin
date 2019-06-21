@@ -22,7 +22,9 @@ import java.io.File
 class GitAutomergerStep @DataBoundConstructor constructor(
     val releaseBranchPattern: String,
     val mergeRules: List<JenkinsMergeRule>?,
-    val logLevel: LogLevel
+    val logLevel: LogLevel,
+    val remoteName: String,
+    val checkoutFromRemote: Boolean
 ) : Builder(), SimpleBuildStep {
 
     override fun getDescriptor(): Descriptor<Builder> = DESCRIPTOR
@@ -38,6 +40,14 @@ class GitAutomergerStep @DataBoundConstructor constructor(
         return FormValidation.ok()
     }
 
+    fun doCheckRemoteName(@QueryParameter remoteName: String): FormValidation {
+        return if (remoteName.isEmpty()) {
+            FormValidation.error("Remote name can't be empty. In most cases you should use 'origin'")
+        } else {
+            FormValidation.ok()
+        }
+    }
+
     override fun perform(run: Run<*, *>, workspace: FilePath, launcher: Launcher, listener: TaskListener) {
         val logger = SLF4JOutputStreamAdapter(listener.logger, logLevel.levelInt)
 
@@ -51,6 +61,8 @@ class GitAutomergerStep @DataBoundConstructor constructor(
                     .pathToRepo(file)
                     .releaseBranchPattern(releaseBranchPattern)
                     .logger(logger)
+                    .checkoutFromRemote(checkoutFromRemote)
+                    .remoteName(remoteName)
 
                 mergeRules.orEmpty().map(JenkinsMergeRule::toMergeConfig).forEach {
                     builder.addMergeConfig(it)
