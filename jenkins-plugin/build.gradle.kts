@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "com.vinted.automerger"
-version = "0.3"
+version = "0.4"
 
 tasks {
     "test"(Test::class) {

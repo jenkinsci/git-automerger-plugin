@@ -74,7 +74,10 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
                             logger.debug("> Conflict for file: $fileName")
 
                             tryResolveConflict(fileName)
+                            git.add().addFilepattern(fileName).call()
                         }
+
+                        git.commit().call()
                     }
                 } catch (e: Exception) {
                     reset().setMode(ResetCommand.ResetType.HARD).setRef("HEAD").call()

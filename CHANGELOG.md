@@ -1,3 +1,7 @@
+## 0.4
+
+- Fix non-working commit after conflict resolution
+
 ## 0.3
 
 - Add checkoutFromRemote option
