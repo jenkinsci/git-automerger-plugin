@@ -2,6 +2,7 @@ package com.vinted.automerger.testutils
 
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.revwalk.filter.RevFilter
+import java.io.File
 
 fun Git.checkoutBranch(branch: String) {
     checkout().setName(branch).call()
@@ -37,4 +38,11 @@ fun Git.commitMessageList(branchName: String, maxCount: Int = Int.MAX_VALUE): Li
         .setRevFilter(RevFilter.NO_MERGES)
         .call()
         .map { it.shortMessage }
+}
+
+fun Git.setCurrentStageTo(dir: File) {
+    rm().addFilepattern("*").call()
+
+    //copy all files from source
+    dir.copyRecursively(repository.directory.parentFile, true)
 }

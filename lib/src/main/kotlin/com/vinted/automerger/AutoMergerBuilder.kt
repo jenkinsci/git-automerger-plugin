@@ -24,6 +24,9 @@ class AutoMergerBuilder {
     var checkoutFromRemote: Boolean = false
         private set
 
+    var detailConflictReport: Boolean = false
+        private set
+
     /**
      * Release branch pattern must contain `%` which denotes to version.
      * For example "release/%" is applicable release/8.10 and release/0.1
@@ -53,6 +56,14 @@ class AutoMergerBuilder {
      * Default `origin`
      */
     fun remoteName(remote: String) = apply { this.remoteName = remote }
+
+    /**
+     * Enables details report in case of conflict.
+     * Detail report includes summary of conflicting lines by author.
+     * It helps determine which author will be easier to solve conflict.
+     * Detail report will be included in exception message.
+     */
+    fun detailConflictReport(enabled: Boolean) = apply { this.detailConflictReport = enabled }
 
     fun build() = AutoMerger(this)
 }

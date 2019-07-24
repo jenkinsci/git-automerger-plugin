@@ -21,6 +21,7 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
 
     private val remoteName = autoMergerBuilder.remoteName
     private val checkoutFromRemote = autoMergerBuilder.checkoutFromRemote
+    private val detailConflictReport = autoMergerBuilder.detailConflictReport
 
     private val git: Git
 
@@ -73,7 +74,13 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
                         for ((fileName, _) in result.conflicts) {
                             logger.debug("> Conflict for file: $fileName")
 
-                            tryResolveConflict(fileName)
+                            if (!tryResolveConflict(fileName)) {
+                                if (detailConflictReport) {
+                                    throw collectDetailReport(result)
+                                } else {
+                                    throw UnresolvedConflictException("There is no defined conflict solver for $fileName")
+                                }
+                            }
                             git.add().addFilepattern(fileName).call()
                         }
 
@@ -99,25 +106,32 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
         }
     }
 
-    private fun tryResolveConflict(fileName: String) {
-        val mode = mergeConfig.find { it.path == fileName }
-        if (mode == null) {
-            throw RuntimeException("There is no defined conflict solver for $fileName")
-        } else {
-            val currentFile = pathToRepo.resolve(fileName)
-            val tmpFile = pathToRepo.resolve("$fileName.tmp")
+    /**
+     * @return true is conflict was resolved
+     */
+    private fun tryResolveConflict(fileName: String): Boolean {
+        val mode = mergeConfig.find { it.path == fileName } ?: return false
+        val currentFile = pathToRepo.resolve(fileName)
+        val tmpFile = pathToRepo.resolve("$fileName.tmp")
 
-            if (tmpFile.exists()) {
-                throw IllegalStateException("Can't create tmp file for merging: $tmpFile")
-            }
-
-            logger.debug("Solving $fileName")
-            Resolver(currentFile.inputStream(), tmpFile.outputStream(), mode.resolution).resolve()
-
-            logger.debug("Conflict solved")
-            tmpFile.copyTo(currentFile, overwrite = true)
-            tmpFile.delete()
+        if (tmpFile.exists()) {
+            throw IllegalStateException("Can't create tmp file for merging: $tmpFile")
         }
+
+        logger.debug("Solving $fileName")
+        Resolver(currentFile.inputStream(), tmpFile.outputStream(), mode.resolution).resolve()
+
+        logger.debug("Conflict solved")
+        tmpFile.copyTo(currentFile, overwrite = true)
+        tmpFile.delete()
+
+        return true
+    }
+
+    private fun collectDetailReport(result: MergeResult): Throwable {
+        val message = ConflictDetailsCollector(git, result).collect()
+
+        return UnresolvedConflictException(message)
     }
 
     private fun allReleaseBranches(): List<Ref> {
