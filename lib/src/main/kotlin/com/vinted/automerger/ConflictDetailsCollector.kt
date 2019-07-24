@@ -16,10 +16,7 @@ class ConflictDetailsCollector(
     private val pathToRepo = git.repository.directory.parentFile
 
     fun collect(): String {
-        for ((filename, _) in mergeResult.conflicts) {
-            git.add().addFilepattern(filename).call()
-        }
-        git.commit().setMessage("Temp commit for proper blaming").call()
+        applyWorkaround()
 
         try {
             val allCommits = mutableMapOf<RevCommit, Int>()
@@ -54,8 +51,19 @@ class ConflictDetailsCollector(
 
 
         } finally {
+            //resets mess of [applyWorkaround]
             git.reset().setMode(ResetCommand.ResetType.HARD).setRef("HEAD^").call()
         }
+    }
+
+    /**
+     * Workaround for bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=434330
+     */
+    private fun applyWorkaround() {
+        for ((filename, _) in mergeResult.conflicts) {
+            git.add().addFilepattern(filename).call()
+        }
+        git.commit().setMessage("Temp commit for proper blaming").call()
     }
 
     private fun calculateConflictLines(filename: String, blameResult: BlameResult): Map<RevCommit, Int> {
