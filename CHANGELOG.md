@@ -1,3 +1,7 @@
+## 0.5
+
+- Add detail report support
+
 ## 0.4
 
 - Fix non-working commit after conflict resolution

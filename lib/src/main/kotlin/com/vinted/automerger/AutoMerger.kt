@@ -22,6 +22,8 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
     private val remoteName = autoMergerBuilder.remoteName
     private val checkoutFromRemote = autoMergerBuilder.checkoutFromRemote
     private val detailConflictReport = autoMergerBuilder.detailConflictReport
+    private val limitAuthorsInDetailReport = autoMergerBuilder.limitAuthorsInDetailReport
+    private val limitCommitsInDetailReport = autoMergerBuilder.limitCommitsInDetailReport
 
     private val git: Git
 
@@ -129,7 +131,12 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
     }
 
     private fun collectDetailReport(result: MergeResult): Throwable {
-        val message = ConflictDetailsCollector(git, result).collect()
+        val message = ConflictDetailsCollector(
+            git = git,
+            mergeResult = result,
+            authorsLimit = limitAuthorsInDetailReport,
+            commitsLimit = limitCommitsInDetailReport
+        ).collect()
 
         return UnresolvedConflictException(message)
     }

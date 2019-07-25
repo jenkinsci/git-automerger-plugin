@@ -27,6 +27,12 @@ class AutoMergerBuilder {
     var detailConflictReport: Boolean = false
         private set
 
+    var limitAuthorsInDetailReport: Int = 3
+        private set
+
+    var limitCommitsInDetailReport: Int = 3
+        private set
+
     /**
      * Release branch pattern must contain `%` which denotes to version.
      * For example "release/%" is applicable release/8.10 and release/0.1
@@ -64,6 +70,24 @@ class AutoMergerBuilder {
      * Detail report will be included in exception message.
      */
     fun detailConflictReport(enabled: Boolean) = apply { this.detailConflictReport = enabled }
+
+    /**
+     * Maximum number of report authors if [detailConflictReport] is enabled.
+     * Large number could bloats report very fast.
+     * @param number must be at least 1
+     */
+    fun limitAuthorsInDetailReport(number: Int): AutoMergerBuilder {
+        if (number < 1) throw IllegalArgumentException("limit author must be at least 1")
+
+        return apply { this.limitAuthorsInDetailReport = number }
+    }
+
+    /**
+     * Maximum number of reported commits for each author if [detailConflictReport] is enabled.
+     * Large number could bloats report very fast.
+     * @param number must 0 or positive number. 0 disables commit reports at all
+     */
+    fun limitCommitsInDetailReport(number: Int) = apply { this.limitCommitsInDetailReport = number }
 
     fun build() = AutoMerger(this)
 }

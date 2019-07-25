@@ -72,7 +72,8 @@ gitAutomerger logLevel: 'INFO',
               ],
               releaseBranchPattern: 'release/%',
               checkoutFromRemote: true,
-              remoteName: 'origin'
+              remoteName: 'origin',
+              detailConflictReport: true
 ```
 
 ### Testing

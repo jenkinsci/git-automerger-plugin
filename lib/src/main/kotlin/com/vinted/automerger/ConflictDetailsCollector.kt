@@ -10,8 +10,8 @@ import org.eclipse.jgit.revwalk.RevCommit
 class ConflictDetailsCollector(
     val git: Git,
     private val mergeResult: MergeResult,
-    private val authorsLimit: Int = 3,
-    private val commitsLimit: Int = 3
+    private val authorsLimit: Int,
+    private val commitsLimit: Int
 ) {
     private val pathToRepo = git.repository.directory.parentFile
 

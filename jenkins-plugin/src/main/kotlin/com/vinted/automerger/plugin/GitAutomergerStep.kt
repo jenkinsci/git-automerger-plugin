@@ -15,6 +15,7 @@ import hudson.util.FormValidation
 import jenkins.tasks.SimpleBuildStep
 import org.jenkinsci.remoting.RoleChecker
 import org.kohsuke.stapler.DataBoundConstructor
+import org.kohsuke.stapler.DataBoundSetter
 import org.kohsuke.stapler.QueryParameter
 import java.io.File
 
@@ -26,6 +27,31 @@ class GitAutomergerStep @DataBoundConstructor constructor(
     val remoteName: String,
     val checkoutFromRemote: Boolean
 ) : Builder(), SimpleBuildStep {
+
+    @set:DataBoundSetter
+    var detailConflictReport: Boolean = false
+
+    @set:DataBoundSetter
+    var limitAuthorsInDetailReport: Int = 3
+    @set:DataBoundSetter
+    var limitCommitsInDetailReport: Int = 3
+
+
+    fun doCheckLimitAuthorsInDetailReport(@QueryParameter number: Int): FormValidation {
+        return if (number < 1) {
+            FormValidation.error("You must let report at least one author")
+        } else {
+            FormValidation.ok()
+        }
+    }
+
+    fun doCheckLimitCommitsInDetailReport(@QueryParameter number: Int): FormValidation {
+        return if (number < 0) {
+            FormValidation.error("Comments limit must be 0 or any positive number")
+        } else {
+            FormValidation.ok()
+        }
+    }
 
     override fun getDescriptor(): Descriptor<Builder> = DESCRIPTOR
 
@@ -63,6 +89,9 @@ class GitAutomergerStep @DataBoundConstructor constructor(
                     .logger(logger)
                     .checkoutFromRemote(checkoutFromRemote)
                     .remoteName(remoteName)
+                    .detailConflictReport(detailConflictReport)
+                    .limitAuthorsInDetailReport(limitAuthorsInDetailReport)
+                    .limitCommitsInDetailReport(limitCommitsInDetailReport)
 
                 mergeRules.orEmpty().map(JenkinsMergeRule::toMergeConfig).forEach {
                     builder.addMergeConfig(it)

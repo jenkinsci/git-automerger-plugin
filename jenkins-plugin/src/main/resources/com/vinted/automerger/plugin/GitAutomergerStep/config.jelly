@@ -27,4 +27,14 @@
     <f:entry title="Remote name" field="remoteName">
         <f:textbox default="origin" />
     </f:entry>
+
+    <f:optionalBlock inline="true" field="detailConflictReport" name="detailConflictReport" title="Show detail conflict report" help="/plugin/git-automerger/detail-report.html">
+        <f:entry title="The max authors in the report" field="limitAuthorsInDetailReport">
+            <f:textbox default="3" />
+        </f:entry>
+
+        <f:entry title="The max commits in the report" field="limitCommitsInDetailReport">
+            <f:textbox default="3" />
+        </f:entry>
+    </f:optionalBlock>
 </j:jelly>
