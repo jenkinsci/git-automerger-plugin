@@ -2,6 +2,7 @@
 
 - Add detail report support
 - Make all params optional
+- Upgrade dependencies
 
 ## 0.4
 
