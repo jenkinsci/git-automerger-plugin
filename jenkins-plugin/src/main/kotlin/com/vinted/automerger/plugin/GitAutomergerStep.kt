@@ -20,13 +20,7 @@ import org.kohsuke.stapler.QueryParameter
 import java.io.File
 
 
-class GitAutomergerStep @DataBoundConstructor constructor(
-    val releaseBranchPattern: String,
-    val mergeRules: List<JenkinsMergeRule>?,
-    val logLevel: LogLevel,
-    val remoteName: String,
-    val checkoutFromRemote: Boolean
-) : Builder(), SimpleBuildStep {
+class GitAutomergerStep @DataBoundConstructor constructor() : Builder(), SimpleBuildStep {
 
     @set:DataBoundSetter
     var detailConflictReport: Boolean = false
@@ -35,6 +29,17 @@ class GitAutomergerStep @DataBoundConstructor constructor(
     var limitAuthorsInDetailReport: Int = 3
     @set:DataBoundSetter
     var limitCommitsInDetailReport: Int = 3
+
+    @set:DataBoundSetter
+    var releaseBranchPattern: String = "release/%"
+    @set:DataBoundSetter
+    var mergeRules: List<JenkinsMergeRule>? = null
+    @set:DataBoundSetter
+    var logLevel: LogLevel = LogLevel.WARN
+    @set:DataBoundSetter
+    var remoteName: String = "origin"
+    @set:DataBoundSetter
+    var checkoutFromRemote: Boolean = false
 
 
     fun doCheckLimitAuthorsInDetailReport(@QueryParameter number: Int): FormValidation {
