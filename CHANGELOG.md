@@ -1,6 +1,7 @@
 ## 0.5
 
 - Add detail report support
+- Make all params optional
 
 ## 0.4
 
