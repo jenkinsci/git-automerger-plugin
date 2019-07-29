@@ -16,7 +16,6 @@ version = "0.5"
 
 tasks {
     "test"(Test::class) {
-        useJUnitPlatform()
         reports {
             html.isEnabled = true
         }
@@ -57,13 +56,14 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("com.vinted:slf4j-streamadapter:1.0.0")
 
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${Versions.junit5Version}")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${Versions.junit5Version}")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:${Versions.junit5Version}")
-    testImplementation("lt.neworld:kupiter:${Versions.kupiter}")
-
     // sezpoz is used to process extension annotations
     kapt("net.java.sezpoz:sezpoz:1.13")
+
+    jenkinsTest("org.jenkins-ci.plugins:pipeline-utility-steps:2.3.0")
+    jenkinsTest("org.jenkins-ci.plugins.workflow:workflow-job:2.33")
+    jenkinsTest("org.jenkins-ci.plugins.workflow:workflow-cps:2.72")
+    jenkinsTest("org.jenkins-ci.plugins.workflow:workflow-basic-steps:2.18")
+    testImplementation("org.eclipse.jgit:org.eclipse.jgit:${Versions.jgit}")
 }
 
 java {
