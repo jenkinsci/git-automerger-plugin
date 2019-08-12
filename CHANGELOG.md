@@ -1,3 +1,7 @@
+## 0.5.1
+
+- Fix serialization error to support multi-node jenkins setup
+
 ## 0.5
 
 - Add detail report support

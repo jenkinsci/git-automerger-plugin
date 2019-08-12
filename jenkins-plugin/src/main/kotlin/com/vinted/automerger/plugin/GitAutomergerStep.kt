@@ -19,7 +19,6 @@ import org.kohsuke.stapler.DataBoundSetter
 import org.kohsuke.stapler.QueryParameter
 import java.io.File
 
-
 class GitAutomergerStep @DataBoundConstructor constructor() : Builder(), SimpleBuildStep {
 
     @set:DataBoundSetter
@@ -80,33 +79,46 @@ class GitAutomergerStep @DataBoundConstructor constructor() : Builder(), SimpleB
     }
 
     override fun perform(run: Run<*, *>, workspace: FilePath, launcher: Launcher, listener: TaskListener) {
-        val logger = SLF4JOutputStreamAdapter(listener.logger, logLevel.levelInt)
+        val builder = AutoMergerBuilder()
+            .releaseBranchPattern(releaseBranchPattern)
+            .checkoutFromRemote(checkoutFromRemote)
+            .remoteName(remoteName)
+            .detailConflictReport(detailConflictReport)
+            .limitAuthorsInDetailReport(limitAuthorsInDetailReport)
+            .limitCommitsInDetailReport(limitCommitsInDetailReport)
 
-        workspace.act(object : FilePath.FileCallable<Any> {
-            override fun checkRoles(checker: RoleChecker) {
-                throw SecurityException()
-            }
+        mergeRules.orEmpty().map(JenkinsMergeRule::toMergeConfig).forEach {
+            builder.addMergeConfig(it)
+        }
 
-            override fun invoke(file: File, channel: VirtualChannel): Any {
-                val builder = AutoMergerBuilder()
-                    .pathToRepo(file)
-                    .releaseBranchPattern(releaseBranchPattern)
-                    .logger(logger)
-                    .checkoutFromRemote(checkoutFromRemote)
-                    .remoteName(remoteName)
-                    .detailConflictReport(detailConflictReport)
-                    .limitAuthorsInDetailReport(limitAuthorsInDetailReport)
-                    .limitCommitsInDetailReport(limitCommitsInDetailReport)
+        workspace.act(AutoMergerExecutor(builder, logLevel, listener))
+    }
 
-                mergeRules.orEmpty().map(JenkinsMergeRule::toMergeConfig).forEach {
-                    builder.addMergeConfig(it)
-                }
+    /**
+     * @param logLevel logger is not serializable, so all info are provided to construct proper logger
+     * @param listener logger is not serializable, so all info are provided to construct proper logger
+     */
+    class AutoMergerExecutor(
+        val autoMergerBuilder: AutoMergerBuilder,
+        var logLevel: LogLevel,
+        val listener: TaskListener
+    ) : FilePath.FileCallable<Boolean> {
 
-                builder.build().automerge()
+        override fun checkRoles(checker: RoleChecker?) {
+            throw SecurityException()
+        }
 
-                return Unit
-            }
-        })
+        override fun invoke(file: File, channel: VirtualChannel): Boolean {
+            val logger = SLF4JOutputStreamAdapter(listener.logger, logLevel.levelInt)
+
+            autoMergerBuilder
+                .logger(logger)
+                .pathToRepo(file)
+                .build()
+                .automerge()
+
+            return true
+        }
     }
 
     companion object {

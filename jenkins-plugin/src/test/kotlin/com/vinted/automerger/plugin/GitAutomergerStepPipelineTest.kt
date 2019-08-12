@@ -1,6 +1,7 @@
 package com.vinted.automerger.plugin
 
 import hudson.FilePath
+import hudson.model.Label
 import hudson.model.Result.SUCCESS
 import hudson.remoting.VirtualChannel
 import org.eclipse.jgit.api.Git
@@ -48,6 +49,33 @@ class GitAutomergerStepPipelineTest {
         project.definition = CpsFlowDefinition(
             """
             node {
+                gitAutomerger logLevel: 'INFO',
+                              mergeRules: [
+                                  [path: 'CHANGELOG.md', resolution: 'MERGE_NEWER_TOP'],
+                                  [path: 'version', resolution: 'KEEP_NEWER'],
+                              ],
+                              detailConflictReport: true,
+                              checkoutFromRemote: true
+            }
+        """.trimIndent(), true
+        )
+
+        val build = project.scheduleBuild2(0)!!.get()
+
+        println(build.log)
+
+        assertEquals(SUCCESS, build.result)
+    }
+
+    @Test
+    fun runAutomergerInAnotherNode() {
+        jenkinsRule.createSlave(Label.parseExpression("android"))
+
+        project.definition = CpsFlowDefinition(
+            """
+            node("android") {
+                sh "git init"
+            
                 gitAutomerger logLevel: 'INFO',
                               mergeRules: [
                                   [path: 'CHANGELOG.md', resolution: 'MERGE_NEWER_TOP'],

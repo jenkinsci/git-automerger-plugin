@@ -4,8 +4,9 @@ import com.vinted.automerger.config.MergeRule
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.io.Serializable
 
-class AutoMergerBuilder {
+class AutoMergerBuilder : Serializable {
 
     var releaseBranchPattern = "release/%"
         private set
@@ -15,6 +16,7 @@ class AutoMergerBuilder {
     var pathToRepo: File? = null
         private set
 
+    @Transient
     var logger: Logger = LoggerFactory.getLogger(AutoMerger::class.java)
         private set
 
