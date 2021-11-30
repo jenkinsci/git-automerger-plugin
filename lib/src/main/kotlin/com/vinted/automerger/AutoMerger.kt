@@ -5,6 +5,9 @@ import com.vinted.automerger.utils.checkNotEmpty
 import com.vinted.automerger.utils.checkNotNull
 import org.apache.maven.artifact.versioning.ComparableVersion
 import org.eclipse.jgit.api.*
+import org.eclipse.jgit.lib.BranchTrackingStatus
+import org.eclipse.jgit.lib.ConfigConstants
+import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.lib.Ref
 import org.eclipse.jgit.merge.MergeStrategy
 
@@ -144,34 +147,46 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
     private fun allReleaseBranches(): List<Ref> {
         if (checkoutFromRemote) {
             logger.info("Checkout from remote $remoteName")
+
             val gitRefPath = "refs/remotes/$remoteName/"
             val localBranches = git.branchList().call().map { it.name.removePrefix("refs/heads/") }
             git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call()
                 .filter { it.name.startsWith(gitRefPath) }
                 .forEach { ref ->
-                    val name = ref.name.removePrefix(gitRefPath)
+                    val branchName = ref.name.removePrefix(gitRefPath)
 
-                    if (!name.matches(branchPatternRegex) && name != MASTER) {
+                    if (!branchName.matches(branchPatternRegex) && branchName != MASTER) {
                         return@forEach
                     }
 
-                    logger.info("Checkout ${ref.name} -> $name")
+                    logger.info("Checkout ${ref.name} -> $branchName")
 
-                    if (localBranches.contains(name)) {
-                        logger.debug("Local branch '$name' was found and it is used, try to pull")
+                    if (localBranches.contains(branchName)) {
+                        logger.debug("Local branch '$branchName' was found and it is used, try to pull")
+
+                        git.checkout()
+                            .setName(branchName)
+                            .setCreateBranch(false)
+                            .call()
+
+                        setTracking(branchName)
+                        if (!canFastForward(branchName)) {
+                            throw java.lang.IllegalStateException("Local branch '$branchName' diverged from remote")
+                        }
+
                         val result = git.pull()
                             .setRemote(remoteName)
-                            .setRemoteBranchName(name)
+                            .setRemoteBranchName(branchName)
                             .setFastForward(MergeCommand.FastForwardMode.FF_ONLY)
                             .call()
 
                         if (!result.isSuccessful) {
-                            throw java.lang.IllegalStateException("Local branch '$name' diverged from remote")
+                            error("Failed to pull $branchName")
                         }
                     } else {
-                        logger.debug("Local branch '$name' was not found. Do checkout for it")
+                        logger.debug("Local branch '$branchName' was not found. Do checkout for it")
                         git.checkout()
-                            .setName(name)
+                            .setName(branchName)
                             .setCreateBranch(true)
                             .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
                             .setStartPoint(ref.name)
@@ -193,6 +208,27 @@ class AutoMerger(autoMergerBuilder: AutoMergerBuilder) {
             .sortedBy { it.second }
             .map { it.first }
             .plus(git.branchList().call().filter { it.name.endsWith(MASTER) }.take(1))
+    }
+
+    private fun canFastForward(branchName: String): Boolean {
+        val bts: BranchTrackingStatus = BranchTrackingStatus.of(git.repository, branchName)
+        return bts.aheadCount == 0
+    }
+
+    private fun setTracking(branchName: String) {
+        val config = git.repository.config;
+        config.setString(
+            ConfigConstants.CONFIG_BRANCH_SECTION,
+            branchName,
+            ConfigConstants.CONFIG_KEY_REMOTE, remoteName
+        )
+        config.setString(
+            ConfigConstants.CONFIG_BRANCH_SECTION,
+            branchName,
+            ConfigConstants.CONFIG_KEY_MERGE,
+            Constants.R_HEADS + branchName
+        )
+        config.save()
     }
 
     companion object {

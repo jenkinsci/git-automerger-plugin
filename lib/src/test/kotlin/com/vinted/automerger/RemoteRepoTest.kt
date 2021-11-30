@@ -1,10 +1,12 @@
 package com.vinted.automerger
 
 import com.vinted.automerger.testutils.*
+import lt.neworld.kupiter.testFactory
 import org.eclipse.jgit.transport.URIish
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -69,7 +71,7 @@ class RemoteRepoTest {
 
         val fixture = defaultBuilder.build()
 
-        assertThrows<IllegalStateException> {
+        assertThrows<IllegalStateException>("Local branch release/8.9 diverged from remote") {
             fixture.automerge()
         }
     }
