@@ -108,7 +108,7 @@ class GitAutomergerStep @DataBoundConstructor constructor() : Builder(), SimpleB
             throw SecurityException()
         }
 
-        override fun invoke(file: File, channel: VirtualChannel): Boolean {
+        override fun invoke(file: File, channel: VirtualChannel?): Boolean {
             val logger = SLF4JOutputStreamAdapter(listener.logger, logLevel.levelInt)
 
             autoMergerBuilder
