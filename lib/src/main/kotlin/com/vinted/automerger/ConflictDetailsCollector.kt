@@ -39,9 +39,9 @@ class ConflictDetailsCollector(
                     acc.apply { compute(commit.authorIdent) { _, list -> (list.orEmpty()) + (commit to nr) } }
                 }
                 .toList()
-                .sortedByDescending { it.second.sumBy { it.second } }
+                .sortedByDescending { it.second.sumOf { it.second } }
                 .joinToString(separator = "\n", limit = authorsLimit) { (author, list) ->
-                    val totalLines = list.sumBy { it.second }
+                    val totalLines = list.sumOf { it.second }
                     val summary = list.joinToString(separator = "\n", limit = commitsLimit) { (commit, total) ->
                         val sha = commit.name.take(8)
                         "  - Commit $sha causes $total lines of conflicts with message: ${commit.shortMessage.take(80)}"

@@ -42,7 +42,7 @@ internal class Resolver(
         while (hasNext()) {
             val line = next()
             if (predicate(line)) {
-                result.appendln(line)
+                result.appendLine(line)
             } else {
                 break
             }
