@@ -2,6 +2,8 @@ package com.vinted.automerger
 
 import com.vinted.automerger.testutils.*
 import lt.neworld.kupiter.testFactory
+import org.eclipse.jgit.api.CreateBranchCommand
+import org.eclipse.jgit.api.ResetCommand
 import org.eclipse.jgit.transport.URIish
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -26,6 +28,10 @@ class RemoteRepoTest {
         with(repo.git) {
             remoteAdd().setName("origin").setUri(URIish(origin.path.absolutePath)).call()
             fetch().setRemote("origin").call()
+            reset()
+                .setMode(ResetCommand.ResetType.HARD)
+                .setRef("origin/master")
+                .call()
         }
 
         defaultBuilder = AutoMergerBuilder().pathToRepo(repo.path).checkoutFromRemote(true)
