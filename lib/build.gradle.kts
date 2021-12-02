@@ -24,7 +24,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:${Versions.junit5Version}")
     testImplementation("org.junit.jupiter:junit-jupiter-params:${Versions.junit5Version}")
     testImplementation("lt.neworld:kupiter:${Versions.kupiter}")
-    testImplementation("com.google.auto.service:auto-service:1.0-rc5")
+    testImplementation("com.google.auto.service:auto-service:1.0.1")
     kaptTest("com.google.auto.service:auto-service:1.0-rc5")
 }
 
