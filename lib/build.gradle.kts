@@ -16,7 +16,7 @@ tasks {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.eclipse.jgit:org.eclipse.jgit:${Versions.jgit}")
-    implementation("org.apache.maven:maven-artifact:3.6.1")
+    implementation("org.apache.maven:maven-artifact:3.8.4")
     implementation("org.slf4j:slf4j-api:${Versions.slf4j}")
     runtimeOnly("org.slf4j:slf4j-simple:${Versions.slf4j}")
 
