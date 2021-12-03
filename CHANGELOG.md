@@ -1,3 +1,14 @@
+## 0.6.3
+
+Just release
+
+## 0.6.0
+
+- Make compatible with Jenkins 2.303.3 by fixing NPE
+- Upgrade dependencies
+- Make sure automerger do not override local branches like hard reset
+- Fix race-condition in tests
+
 ## 0.5.1
 
 - Fix serialization error to support multi-node jenkins setup
