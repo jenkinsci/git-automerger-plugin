@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm")
     kotlin("kapt")
-    id("org.jenkins-ci.jpi") version "0.43.0"
+    id("org.jenkins-ci.jpi") version "0.45.0"
 }
 
 group = "com.vinted.automerger"
